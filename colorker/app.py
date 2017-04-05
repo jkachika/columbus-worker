@@ -338,17 +338,14 @@ class TargetScheduler(Thread):
                         flow = target_process.flow_id
                         if flow in self.ready_queue[user]:
                             self.lock.acquire()
-                            next_target_process = self.ready_queue[user][flow].popleft()
-                            self.lock.release()
-                            for element in next_target_input.parents:
-                                if element in next_target_process.target.input.parents and len(
-                                        next_target_process.target.input.local_pickles[element]) == 0:
-                                    next_target_process.target.input.local_pickles[element].extend(
-                                        next_target_input.local_pickles[element])
-                                    next_target_process.target.input.global_pickles[element].extend(
-                                        next_target_input.global_pickles[element])
-                            self.lock.acquire()
-                            self.ready_queue[user][flow].appendleft(next_target_process)
+                            for next_target_process in self.ready_queue[user][flow]:
+                                for element in next_target_input.parents:
+                                    if element in next_target_process.target.input.parents and len(
+                                            next_target_process.target.input.local_pickles[element]) == 0:
+                                        next_target_process.target.input.local_pickles[element].extend(
+                                            next_target_input.local_pickles[element])
+                                        next_target_process.target.input.global_pickles[element].extend(
+                                            next_target_input.global_pickles[element])
                             self.lock.release()
                     else:
                         logger.warning("Target=%s of flow %d did not produce output." % (
