@@ -484,7 +484,7 @@ class EngineThread(threading.Thread):
                                                                 parties=self.element.parties, admin=admin)
                         ftkeys.append(ftkey)
                     self.element.ftkey = ",".join(ftkeys)
-            directory = "%s%s/pickles/targets/h%d" % (EngineThread.get_engine_setting(
+            directory = "%s/%s/pickles/targets/h%d" % (EngineThread.get_engine_setting(
                 STORAGE.PERSISTENT.LOCAL), self.username, self.history.id)
             fileref = ("component-" if isinstance(self.element, Component) else "combiner-") + str(self.element.id)
             filename = "h" + str(self.history.id) + filekey + str(self.element.id) + ".pickle"
@@ -621,7 +621,7 @@ class EngineThread(threading.Thread):
             # self.history.save(self.master)
             if isinstance(self.element, Component) and self.element.is_root:
                 __input__ = self.fetch_raw_data()
-                directory = "%s%s/pickles/targets/h%d" % (EngineThread.get_engine_setting(
+                directory = "%s/%s/pickles/targets/h%d" % (EngineThread.get_engine_setting(
                     STORAGE.PERSISTENT.LOCAL), self.username, self.history.id)
                 filename = "h" + str(self.history.id) + "e" + str(self.element.id) + ".pickle"
                 engine_res = EngineResource(source=self.query.source, details=self.query.desc, data=__input__)

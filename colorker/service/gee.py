@@ -102,7 +102,7 @@ def upload_object(bucket, filename, readers, owners, user_settings=None, access=
     # This is the request body as specified:
     # http://g.co/cloud/storage/docs/json_api/v1/objects/insert#request
     body = {
-        'name': filename,
+        'name': filename[1:] if filename[0] == '/' else filename,
     }
     # If specified, create the access control objects and add them to the
     # request body
