@@ -4,6 +4,12 @@
 # Date: 19th May 2016
 # Fusion Tables API:
 # https://developers.google.com/resources/api-libraries/documentation/fusiontables/v2/python/latest/index.html
+"""
+Includes functions to integrate with Google Fusion Tables. The results and implementation is based on the API
+provided by the Google Fusion Tables API:
+
+https://developers.google.com/resources/api-libraries/documentation/fusiontables/v2/python/latest/index.html
+"""
 
 import csv
 import os
@@ -29,17 +35,22 @@ def create_table(name, description, columns, data=None, share_with=None, admin=N
     """
     Creates a fusion table for the given data and returns the table id.
 
-    :param name: Name of the fusion table to create
-    :param description: Description of the table to be created
+    :param str name: Name of the fusion table to create
+    :param str description: Description of the table to be created
     :param columns: List of dictionaries having properties name and type
+    :type columns: list(dict)
     :param data: List of dictionaries (optional)
+    :type data: list(dict)
     :param share_with: Single email addreess string or  a List of user email addresses (gmail only)
                       to share the created fusion table
-    :param admin: email address of the administrator who should have edit access to the created fusion table
-    :param user_settings: optional, A dictionary of settings specifying credentials for appropriate services. If one
-    is not provided, then this method must be invoked by an EngineThread which defines the settings
+    :type share_with: str or list(str)
+    :param str admin: email address of the administrator who should have edit access to the created fusion table
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
 
-    :rtype: String, the table id of the created fusion table
+    :rtype: str
+    :return: the table id of the created fusion table
     """
     ft_service = CredentialManager.get_fusion_tables_service(user_settings)
     drive_service = CredentialManager.get_drive_service(user_settings)
@@ -53,7 +64,7 @@ def create_table(name, description, columns, data=None, share_with=None, admin=N
             else "STRING"
 
     body = dict(name=name, description=description, attribution="Created by Columbus Workflow Engine",
-                attributionLink="http://www.cs.colostate.edu/~sangmi/", columns=columns, isExportable=True)
+                attributionLink="http://www.columbus.cs.colostate.edu", columns=columns, isExportable=True)
     table = ft_service.table()
     result = table.insert(body=body).execute(num_retries=3)
     table_id = result["tableId"]
@@ -169,6 +180,16 @@ def create_ft_from_ftc(name, description, ftc, parties=None, admin=None, user_se
 
 
 def delete_table(table_id, user_settings=None):
+    """
+    Deletes a fusion table
+
+    :param str table_id: identifier of the fusion table
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :raises BaseException: Any exception resulting from this operation
+    """
     try:
         ft_keys = str(table_id).split(',')
         for key in ft_keys:
@@ -181,6 +202,16 @@ def delete_table(table_id, user_settings=None):
 
 
 def read_table(table_id, user_settings=None):
+    """
+    Reads a fusion table and returns its contants as a list of dictionaries
+
+    :param str table_id: identifier of the fusion table
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :raises BaseException: Any exception resulting from this operation
+    """
     try:
         ft_service = CredentialManager.get_fusion_tables_service(user_settings)
         query = ft_service.query()

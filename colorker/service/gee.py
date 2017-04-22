@@ -1,3 +1,6 @@
+"""
+Includes functions that integrate Google cloud storage and Google Earth Engine
+"""
 import errno
 import logging
 import os
@@ -15,6 +18,17 @@ logger = logging.getLogger('worker')
 
 
 def download_object(bucket, filename, out_file, user_settings=None, access=ServiceAccount.STORAGE):
+    """
+    Downloads an object from the Google cloud storage bucket of the user specified on the account page of Columbus
+
+    :param str bucket: name of the Google cloud storage bucket
+    :param str filename: path of the object in the bucket
+    :param str out_file: path to store the downloaded file. If you don't know the path, use /tmp
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :param str access: must be 'storage'. Other values are for internal use
+    """
     if access == ServiceAccount.STORAGE:
         service = CredentialManager.get_client_storage_service(user_settings)
     elif access == ServiceAccount.EARTH_ENGINE:
@@ -38,6 +52,17 @@ def download_object(bucket, filename, out_file, user_settings=None, access=Servi
 
 
 def delete_object(bucket, filename, user_settings=None, access=ServiceAccount.GCS):
+    """
+    Deletes an object from the specified bucket
+
+    :param str bucket: name of the Google cloud storage bucket
+    :param str filename: path of the object in the bucket
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :param access: must be 'storage'. Other values are for internal use only
+    :return: Returns the response obtained from the API
+    """
     if access == ServiceAccount.EARTH_ENGINE:
         service = CredentialManager.get_ee_storage_service(user_settings)
     else:
@@ -48,7 +73,17 @@ def delete_object(bucket, filename, user_settings=None, access=ServiceAccount.GC
 
 
 def get_bucket_metadata(bucket, user_settings=None, access=ServiceAccount.STORAGE):
-    """Retrieves metadata about the given bucket."""
+    """
+    Retrieves metadata about the given bucket.
+
+    :param str bucket: name of the Google cloud storage bucket
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :param access: must be 'storage'. Other values are for internal use only
+
+    :return: Returns the response obtained from the API by uploading the object
+    """
     if access == ServiceAccount.STORAGE:
         service = CredentialManager.get_client_storage_service(user_settings)
     elif access == ServiceAccount.EARTH_ENGINE:
@@ -62,7 +97,18 @@ def get_bucket_metadata(bucket, user_settings=None, access=ServiceAccount.STORAG
 
 
 def list_bucket(bucket, user_settings=None, access=ServiceAccount.STORAGE):
-    """Returns a list of metadata of the objects within the given bucket."""
+    """
+    Returns a list of metadata of the objects within the given bucket.
+
+    :param str bucket: name of the Google cloud storage bucket
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :param access: must be 'storage'. Other values are for internal use only
+
+    :rtype: list
+    :return: List of object paths
+    """
     if access == ServiceAccount.STORAGE:
         service = CredentialManager.get_client_storage_service(user_settings)
     elif access == ServiceAccount.EARTH_ENGINE:
@@ -87,13 +133,17 @@ def upload_object(bucket, filename, readers, owners, user_settings=None, access=
     """
     Uploads the specified file to the specified bucket. The object path in the bucket is same as the
     path of the file specified.
-    :param bucket: Name of the cloud storage bucket
-    :param filename: fully qualified name of the file to upload
-    :param readers: list of email addresses
-    :param owners: list of email addresses
-    :param user_settings: optional, a dictionary of user credentials for appropriate services.
-    If one is not provided, then this method must be invoked by an EngineThread which defines the settings
-    :return:
+
+    :param str bucket: Name of the cloud storage bucket
+    :param str filename: fully qualified name of the file to upload
+    :param list(str) readers: list of email addresses
+    :param list(str) owners: list of email addresses
+    :param dict user_settings: optional, a dictionary of user credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :param str access: must be 'storage'. Other values are for internal use only
+
+    :return: Returns the response obtained from the API by uploading the object
     """
     if access == ServiceAccount.EARTH_ENGINE:
         service = CredentialManager.get_ee_storage_service(user_settings)
@@ -136,8 +186,12 @@ def upload_object(bucket, filename, readers, owners, user_settings=None, access=
 
 def get_geojson(ftc):
     """
-    Returns the geojson representation of the ee.FeatureCollection. This function can be called only by an EngineThread
+    Returns the geojson representation of the ee.FeatureCollection.
+    This function must be called from an EngineThread
+
     :param ftc: an instance of ee.FeatureCollection
+
+    :raises Exception: Any exception resulting from this operation
     """
     try:
         return ftc.getInfo()

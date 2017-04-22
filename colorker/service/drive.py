@@ -5,6 +5,14 @@
 # Google Drive API:
 # https://developers.google.com/drive/v3/reference/
 # https://developers.google.com/resources/api-libraries/documentation/drive/v3/python/latest/
+"""
+Includes functions to integrate with a user's Google drive. The results and implementation is based on the API
+provided by the Google Drive API:
+
+https://developers.google.com/drive/v3/reference/
+
+https://developers.google.com/resources/api-libraries/documentation/drive/v3/python/latest/
+"""
 import io
 import os
 import threading
@@ -60,6 +68,15 @@ def list_files(query=None, order_by=None, files=False, user_settings=None):
 
 
 def get_metadata(file_id, user_settings=None):
+    """
+    Obtains the metadata of a file
+
+    :param str file_id: the identifier of the file whose metadata is needed
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+    :return: metadata of the file including id, mimeType, size, parents, kind, fileExtension, and webContentLink
+    """
     drive_service = CredentialManager.get_client_drive_service(user_settings)
     files_service = drive_service.files().get(
         fileId=file_id, fields='id, mimeType, size, parents, kind, name, fileExtension, webContentLink')
@@ -67,6 +84,19 @@ def get_metadata(file_id, user_settings=None):
 
 
 def get_file_contents(file_id, meta_err=False, user_settings=None):
+    """
+    Obtains the contents of a file as a list of dictionaries. File type of the requested file must be a csv or a
+    Google fusion table.
+
+    :param str file_id: the identifier of the file whose content is needed
+    :param bool meta_err: optional, internal use only
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :return: list of dictionaries where each dictionary is a row in the file
+    :rtype: list
+    """
     metadata = get_metadata(file_id, user_settings)
     if (metadata.get('fileExtension', None) == 'csv' or metadata.get('mimeType', None) == 'text/csv') and metadata.get(
             'webContentLink', None):

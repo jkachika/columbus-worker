@@ -6,7 +6,10 @@
 # https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/python/latest/index.html
 
 """
-This file handles the bigquery service api access
+Includes functions to integrate with Google Bigquery. The results and implementation is based on the API
+provided by the Google Bigquery API:
+
+https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/python/latest/index.html
 """
 import logging
 import traceback
@@ -118,6 +121,16 @@ def _parse_table_name(qualified_table_name):
 
 
 def get_all_tables(user_settings=None):
+    """
+    Obtains all the table names from all the bigquery projects.
+
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :return: `[{project_name:dataset_name : [table_name_1, table_name_2]}]`
+    :rtype: list(dict)
+    """
     all_tables = []
     projects = _fetch_projects(user_settings)
     for project in projects:
@@ -132,6 +145,17 @@ def get_all_tables(user_settings=None):
 
 
 def get_features(qualified_table_name, user_settings=None):
+    """
+    Obtains the columns of a bigquery table
+
+    :param str qualified_table_name: table name, must be of the form  `project_name:dataset_name.table_name`
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :return: List of key value pairs where key is column name and value is column type
+    :rtype: list
+    """
     try:
         metadata = _parse_table_name(qualified_table_name)
         table = _describe_table(table_id=metadata["tid"], dataset_id=metadata["did"], project_id=metadata["pid"],
@@ -190,6 +214,21 @@ def select_star(qualified_table_name, where=None, sync=False, user_settings=None
 
 
 def get_query_results(qualified_table_name, query, user_settings=None):
+    """
+    Obtains the results of a query. A call to this method will block until the results are obtained
+
+    :param str qualified_table_name: table name, must be of the form  project-name:dataset-name.table-name
+    :param str query: A SQL query that conforms to the syntax of Bigquery query
+    :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                            If one is not provided, then this method must be invoked by an EngineThread
+                            which defines the settings
+
+    :return: `{fields: [{name: column_name_1, type:column_type_1}, ...],`
+              `rows: [[{v:column_1_value}, {v:column_2_value}, ...], [{v:column_1_value}, {v:column_2_value}, ...]],`
+              `total: total_number_of_rows,`
+              `cached: boolean, whether the results returned were obtained from cache}`
+    :rtype: dict
+    """
     table = _parse_table_name(qualified_table_name)
     return _execute_job(project_id=table["pid"], dataset_id=table["did"],
                         query=query, sync=True, user_settings=user_settings)

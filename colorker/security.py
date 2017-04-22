@@ -1,3 +1,7 @@
+"""
+Includes functionality to obtain access to appropriate Cloud services based on the given credentials of a user
+"""
+
 import threading
 
 import ee
@@ -40,9 +44,11 @@ class CredentialManager:
     def __build_credentials(service_name, scopes, user_settings=None):
         """
         internal use only. returns a credentials instance from the security information available on current thread
-        :param service_name - string, could be one of bigquery, fusiontables, earthengine, drive, storage, storage_rw
-        :param scopes - list, list of scopes to which this credentials instance should have access
-        :except MissingCredentialsException
+
+        :param str service_name: could be one of bigquery, fusiontables, earthengine, drive, storage, storage_rw
+        :param list scopes: list of scopes to which this credentials instance should have access
+
+        :raises: MissingCredentialsException: if credentials cannot be obtained from user settings
         """
         if user_settings is None:
             user_settings = threading.current_thread().settings
@@ -76,6 +82,16 @@ class CredentialManager:
 
     @staticmethod
     def get_earth_engine(user_settings=None):
+        """
+        Obtains the Google Earth Engine object that can be used to do GIS computations.
+
+        :param dict user_settings: optional, A dictionary of settings specifying credentials for appropriate services.
+                                If one is not provided, then this method must be invoked by an EngineThread
+                                which defines the settings
+
+        :rtype: object
+        :return: The Earth Engine object
+        """
         scopes = ['https://www.googleapis.com/auth/earthengine',
                   'https://www.googleapis.com/auth/devstorage.full_control']
         credentials = CredentialManager.__build_credentials(ServiceAccount.EARTH_ENGINE, scopes, user_settings)

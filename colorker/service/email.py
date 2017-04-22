@@ -1,3 +1,12 @@
+#!/usr/bin/python
+#
+# Author: Johnson Kachikaran (johnsoncharles26@gmail.com)
+# Date: 19th May 2016
+
+"""
+Includes functions that facilitate sending an email to the requested people
+"""
+
 import logging
 import threading
 import traceback
@@ -10,11 +19,13 @@ logger = logging.getLogger('worker')
 
 def send_mail(receivers, subject, message, html=None):
     """
-    Sends an email to the recipients. Must be called by an EngineThread.
-    :param receivers: list of recipient email addresses
-    :param subject: subject of the email
-    :param message: plain text message
-    :param html: HTML message
+    Sends an email to the recipients. Must be called from an EngineThread. This method will not raise any exception
+    if it fails to send a message to the recipients.
+
+    :param list(str) receivers: list of recipient email addresses
+    :param str subject: subject of the email
+    :param str message: plain text message
+    :param str html: HTML message
     """
     if not isinstance(receivers, list):
         raise ValueError('Invalid recipients. Must be a list of email addresses.')

@@ -1,5 +1,5 @@
 from colorker import settings
-from colorker.core import Worker
+from colorker.app import Worker
 from multiprocessing import freeze_support
 
 if __name__ == '__main__':
