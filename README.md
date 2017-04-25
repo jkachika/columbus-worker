@@ -10,6 +10,46 @@ Refer to the API for the methods that can be used in the code, [here](https://jk
  * Linux based OS
  * Python 2.7
  
+## Installation
+This section shows the instructions to instal the Columbus worker on Google Compute Engine instance running Debian 8 Jessie.
+
+- Installing prerequisites
+    ```shell
+    $ sudo apt-get update
+    $ curl -O https://bootstrap.pypa.io/get-pip.py
+    $ sudo python get-pip.py
+    $ sudo pip install virtualenv
+    $ sudo apt-get install -y build-essential libmysqlclient-dev python-dev 
+    $ sudo apt-get install -y libssl-dev libffi-dev libxml2-dev libxslt-dev
+    ```
+
+- Installing virtual environment
+    ```shell
+    $ virtualenv --no-site-packages -p /usr/bin/python2.7 /home/$USER/venv
+    $ cd /home/$USER/venv
+    $ source bin/activate
+    ```
+
+- Installing the worker
+    ```shell
+    (venv)$ wget https://github.com/jkachika/columbus-worker/archive/master.zip
+    (venv)$ unzip master.zip 
+    (venv)$ mv columbus-worker-master columbus-worker
+    (venv)$ cd columbus-worker
+    (venv)$ python setup.py sdist
+    (venv)$ pip install --upgrade dist/columbusworker-0.1.0.tar.gz
+    ```
+
+- Running the worker (master ip address and port number are required)
+    ```shell
+    (venv)$ nohup python -m colorker <master-ip> <port-number> ./colorker.log &
+    ```
+
+- Deactivating virtual environment
+    ```shell
+    (venv)$ deactivate
+    ```
+ 
 ## Output Types
 Columbus supports the following output types - CSV List, Feature, Feature Collection, Multi Collection, and Blob. 
 All output data is transferred as is to subsequent elements in the workflow.
