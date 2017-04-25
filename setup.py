@@ -35,8 +35,7 @@ setup(
     version=get_version(),
     author="Johnson Kachikaran",
     author_email="johnsoncharles26@gmail.com",
-    description=("Columbus Worker Module needed for the distributed execution of workflows in "
-                 "Columbus - A Scientific Workflow and Analytics Engine For Spatio-Temporal MultiDimensional Datasets"),
+    description="A library for distributed execution of workflows submitted through Columbus",
     license="MIT",
     keywords="scientific workflows, distributed, GIS, python, spatio-temporal",
     url="https://github.com/jkachika/columbus-worker",
@@ -47,7 +46,9 @@ setup(
         ],
     },
     test_suite='colorker/tests',
-    long_description=read('README'),
+    long_description=("This library is responsible for reliable execution of targets involved in a workflow "
+                      "composed using the Columbus workflow engine, referred to as master. The library connects to "
+                      "multiple Google cloud platform services whose credentials are configured on the master."),
     classifiers=[
         # Get strings from
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
